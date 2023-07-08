@@ -1,4 +1,4 @@
-import { Mode } from './types/custom'
+import type { Mode } from './types/custom'
 import type { Readable } from 'node:stream'
 
 import dotenv from 'dotenv'
@@ -10,11 +10,13 @@ import { GetObjectCommand, S3Client } from '@aws-sdk/client-s3'
 import sharp, { FitEnum } from 'sharp'
 import parseInstructions from './middlewares/parse-instructions'
 import { fromBase64U } from './lib/base64u'
+import winston from 'winston'
+import expressWinston from 'express-winston'
 
 dotenv.config()
 
 process.on('SIGINT', () => {
-    console.info("Interrupted")
+    console.info('Interrupted')
     process.exit(0)
 })
 
@@ -31,6 +33,20 @@ if (!AWS_S3_ACCESS_KEY_ID || !AWS_S3_SECRET_ACCESS_KEY) {
 }
 
 const server = express()
+
+server.use(
+    expressWinston.logger({
+        transports: [new winston.transports.Console()],
+        format: winston.format.combine(winston.format.colorize(), winston.format.json()),
+        meta: true, // optional: control whether you want to log the meta data about the request (default to true)
+        msg: 'HTTP {{req.method}} {{req.url}}', // optional: customize the default logging message. E.g. "{{res.statusCode}} {{req.method}} {{res.responseTime}}ms {{req.url}}"
+        expressFormat: true, // Use the default Express/morgan request formatting. Enabling this will override any msg if true. Will only output colors with colorize set to true
+        colorize: false, // Color the text and status code, using the Express/morgan color palette (text: gray, status: default green, 3XX cyan, 4XX yellow, 5XX red).
+        ignoreRoute: function (req, res) {
+            return false
+        }, // optional: allows to skip some log messages based on request and/or response
+    })
+)
 
 // Validate input parameters
 server.use(
