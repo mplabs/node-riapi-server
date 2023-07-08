@@ -1,0 +1,19 @@
+{
+    "extends": "@tsconfig/node18",
+    "ts-node": {
+        // It is faster to skip typechecking.
+        // Remove if you want ts-node to do typechecking.
+        "transpileOnly": true
+    },
+    "compilerOptions": {
+        "esModuleInterop": true,
+        "sourceMap": true,
+        "outDir": "build",
+        "baseUrl": "./src",
+        "paths": {
+            "@/*": ["*"]
+        }
+    },
+    "include": ["src/**/*"],
+    "exclude": ["src/public"]
+}
