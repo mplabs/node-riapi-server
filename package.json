@@ -1,7 +1,7 @@
 {
     "name": "riapi-server",
     "description": "RiAPI Server",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "main": "build/server.js",
     "scripts": {
         "dev": "nodemon",

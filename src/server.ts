@@ -145,6 +145,7 @@ server.get('/s3/*', async (req, res) => {
 
         stream
             .pipe(transformer)
+            .toFormat('jpeg', { progressive: true, quality: instructions?.v || 80 })
             .toBuffer()
             .then((buffer) => {
                 res.writeHead(200, {
