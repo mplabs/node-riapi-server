@@ -12,6 +12,7 @@ import parseInstructions from './middlewares/parse-instructions'
 import { fromBase64U } from './lib/base64u'
 import winston from 'winston'
 import expressWinston from 'express-winston'
+import cache from './middlewares/cache'
 
 dotenv.config()
 
@@ -71,6 +72,9 @@ server.use(errors())
 
 // Parse input parameters
 server.use(parseInstructions())
+
+// Caching
+server.use(cache())
 
 const mapWidthInstructionToSharp = (mode?: Mode): keyof FitEnum | undefined => {
     if (!mode) {
@@ -151,6 +155,8 @@ server.get('/s3/*', async (req, res) => {
                 res.writeHead(200, {
                     'Content-Type': contentType,
                     'Content-Length': buffer.length,
+                    Expires: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toUTCString(),
+                    'Cache-Control': 'public, max-age=31536000, immutable',
                 })
                 res.end(buffer)
             })
